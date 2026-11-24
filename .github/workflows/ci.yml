@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Setup JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
@@ -76,7 +76,7 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Setup JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
@@ -104,6 +104,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -qq -y libstdc++6 lib32stdc++6 lib32z1
+          echo "y" | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --install "emulator" "platform-tools" > /dev/null
           
       - name: Setup Emulator API 21
         run: |
