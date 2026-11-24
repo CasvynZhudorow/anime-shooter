@@ -1,6 +1,7 @@
 package com.animeshooter.systems
 
 import com.animeshooter.ecs.*
+import com.animeshooter.entities.EntityFactory
 import com.badlogic.ashley.core.ComponentMapper
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
@@ -9,6 +10,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
+import kotlin.math.sqrt
 
 // Movement System - Priority 0
 class MovementSystem(priority: Int) : IteratingSystem(
@@ -41,6 +43,12 @@ class PlayerMovementSystem(priority: Int) : IteratingSystem(
     private val screenHeight = Gdx.graphics.height.toFloat()
     private val margin = 30f
     
+    var playerEntity: Entity? = null
+    
+    fun setPlayerEntity(player: Entity?) {
+        playerEntity = player
+    }
+    
     override fun processEntity(entity: Entity, deltaTime: Float) {
         val transform = transformMapper.get(entity)
         val velocity = velocityMapper.get(entity)
@@ -53,7 +61,7 @@ class PlayerMovementSystem(priority: Int) : IteratingSystem(
             
             val dx = targetX - transform.position.x
             val dy = targetY - transform.position.y
-            val dist = MathUtils.sqrt(dx * dx + dy * dy)
+            val dist = sqrt(dx * dx + dy * dy)
             
             if (dist > 5f) {
                 velocity.velocity.set(dx, dy).nor().scl(player.moveSpeed)

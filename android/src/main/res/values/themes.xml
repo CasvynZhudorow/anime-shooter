@@ -1,0 +1,8 @@
+<resources>
+    <style name="Theme.AnimeShooter" parent="android:Theme.NoTitleBar.Fullscreen">
+        <item name="android:windowBackground">@color/black</item>
+        <item name="android:colorBackground">@color/black</item>
+    </style>
+    
+    <color name="black">#FF000000</color>
+</resources>

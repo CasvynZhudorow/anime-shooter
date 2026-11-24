@@ -109,15 +109,15 @@ class GameScreen(private val game: GameMain) : ScreenAdapter() {
         }
         
         // Ultimate key (Space on desktop, or double-tap on mobile - simplified to touch)
-        if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.SPACE)) {
-            world.setPlayerInput(0f, 0f, false, true)
-        }
+                if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.SPACE)) {
+                    world.setPlayerInput(0f, 0f, false, true)
+                }
         
-        // Pause
-        if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.ESCAPE) || 
-            Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.P)) {
-            world.togglePause()
-        }
+                // Pause
+                if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.ESCAPE) || 
+                    Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.P)) {
+                    world.togglePause()
+                }
     }
     
     private fun updateScreenShake(delta: Float) {

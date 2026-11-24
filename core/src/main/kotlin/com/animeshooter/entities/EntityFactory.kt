@@ -3,7 +3,7 @@ package com.animeshooter.entities
 import com.animeshooter.ecs.*
 import com.animeshooter.models.ModelGenerator
 import com.badlogic.ashley.core.Entity
-import com.badlogic.ashley.core.EntityEngine
+import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.PooledEngine
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
@@ -193,15 +193,15 @@ class EntityFactory(private val engine: PooledEngine) {
     
     fun createBoss(stage: Int): Entity {
         val boss = engine.createEntity()
-        val maxHealth = 50 + stage * 30
+        val bossMaxHealth = 50 + stage * 30
         
         boss.add(TransformComponent().apply { position.set(screenWidth / 2f, screenHeight + 100f, 0f) })
         boss.add(VelocityComponent().apply { velocity.set(0f, -30f) })
         boss.add(EnemyComponent().apply {
             enemyType = EnemyType.BOSS
             isBoss = true
-            this.health = maxHealth
-            maxHealth = maxHealth
+            this.health = bossMaxHealth
+            maxHealth = bossMaxHealth
             moveSpeed = 30f
             fireRate = 0.8f
             scoreValue = 500 + stage * 200

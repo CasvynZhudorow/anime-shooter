@@ -85,7 +85,7 @@ data class ProjectileComponent(
     var source: ProjectileSource = ProjectileSource.PLAYER,
     var damage: Int = 1,
     var speed: Float = 600f,
-    var direction: com.badlogic.gdx.math.Vector2 = com.badlogic.gdx.math.Vector2(0, 1),
+    var direction: com.badlogic.gdx.math.Vector2 = com.badlogic.gdx.math.Vector2(0f, 1f),
     var isHoming: Boolean = false,
     var pierceRemaining: Int = 0,
     var lifetime: Float = 3f,
