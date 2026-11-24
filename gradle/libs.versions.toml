@@ -1,0 +1,43 @@
+[versions]
+agp = "8.4.0"
+kotlin = "1.9.22"
+libgdx = "1.12.1"
+ashley = "1.7.4"
+box2d = "1.12.1"
+freetype = "1.12.1"
+junit = "5.10.2"
+truth = "1.1.5"
+espresso = "3.5.1"
+runner = "1.5.2"
+rules = "1.5.0"
+robolectric = "4.11"
+mockk = "1.13.12"
+
+[libraries]
+# LibGDX
+libgdx-core = { module = "com.badlogicgames.gdx:gdx", version.ref = "libgdx" }
+libgdx-box2d = { module = "com.badlogicgames.gdx:gdx-box2d", version.ref = "box2d" }
+libgdx-freetype = { module = "com.badlogicgames.gdx:gdx-freetype", version.ref = "freetype" }
+libgdx-platform = { module = "com.badlogicgames.gdx:gdx-platform", version.ref = "libgdx" }
+libgdx-box2d-platform = { module = "com.badlogicgames.gdx:gdx-box2d-platform", version.ref = "box2d" }
+libgdx-freetype-platform = { module = "com.badlogicgames.gdx:gdx-freetype-platform", version.ref = "freetype" }
+libgdx-backend-lwjgl3 = { module = "com.badlogicgames.gdx:gdx-backend-lwjgl3", version.ref = "libgdx" }
+libgdx-backend-android = { module = "com.badlogicgames.gdx:gdx-backend-android", version.ref = "libgdx" }
+
+# Ashley ECS
+ashley = { module = "com.badlogicgames.ashley:ashley", version.ref = "ashley" }
+
+# Testing
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
+truth = { module = "com.google.truth:truth", version.ref = "truth" }
+espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso" }
+runner = { module = "androidx.test:runner", version.ref = "runner" }
+rules = { module = "androidx.test:rules", version.ref = "rules" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+application = { id = "application" }

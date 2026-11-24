@@ -1,0 +1,148 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+      
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.5'
+      
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+      
+      - name: Build Debug APK
+        run: ./gradlew :android:assembleDebug --no-daemon
+        timeout-minutes: 15
+      
+      - name: Run Unit Tests
+        run: ./gradlew :core:test --no-daemon
+        timeout-minutes: 10
+      
+      - name: Android Lint
+        run: ./gradlew :android:lintDebug --no-daemon
+        timeout-minutes: 10
+      
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-apk
+          path: android/build/outputs/apk/debug/*.apk
+          retention-days: 7
+      
+      - name: Upload Lint Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lint-report
+          path: android/build/reports/lint-results-debug.html
+          retention-days: 7
+      
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: core/build/reports/tests/
+          retention-days: 7
+
+  instrumented-test:
+    name: Instrumented Tests (API 21 & 30)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+      
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.5'
+      
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+      
+      - name: Cache Android SDK
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.android/build-cache
+            /opt/android-sdk
+          key: android-sdk-${{ runner.os }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          restore-keys: |
+            android-sdk-${{ runner.os }}-
+      
+      - name: Install Android SDK
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y libstdc++6 lib32stdc++6 lib32z1
+          
+      - name: Setup Emulator API 21
+        run: |
+          echo "y" | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --install "system-images;android-21;default;x86_64" > /dev/null
+          echo "no" | ${ANDROID_HOME}/cmdline-tools/latest/bin/avdmanager create avd -n test21 -k "system-images;android-21;default;x86_64" --force > /dev/null
+      
+      - name: Setup Emulator API 30
+        run: |
+          echo "y" | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --install "system-images;android-30;default;x86_64" > /dev/null
+          echo "no" | ${ANDROID_HOME}/cmdline-tools/latest/bin/avdmanager create avd -n test30 -k "system-images;android-30;default;x86_64" --force > /dev/null
+      
+      - name: Start Emulator API 21
+        run: |
+          ${ANDROID_HOME}/emulator/emulator -avd test21 -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -memory 2048 &
+          # Wait for boot
+          adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done'
+          adb shell input keyevent 82
+      
+      - name: Start Emulator API 30
+        run: |
+          ${ANDROID_HOME}/emulator/emulator -avd test30 -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -memory 2048 &
+          # Wait for boot
+          adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done'
+          adb shell input keyevent 82
+      
+      - name: Run Instrumented Tests API 21
+        run: |
+          ./gradlew :android:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.target=test21 --no-daemon
+        timeout-minutes: 20
+      
+      - name: Run Instrumented Tests API 30
+        run: |
+          ./gradlew :android:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.target=test30 --no-daemon
+        timeout-minutes: 20
+      
+      - name: Upload Instrumented Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: instrumented-test-results
+          path: android/build/reports/androidTests/
+          retention-days: 7
