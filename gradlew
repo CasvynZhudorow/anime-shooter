@@ -28,7 +28,7 @@ APP_NAME="Gradle"
 APP_BASE_NAME=`basename "$0"`
 
 # Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
-DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
+DEFAULT_JVM_OPTS="-Xmx64m -Xms64m"
 
 # Use the maximum available, or set MAX_FD != -1 to use that value.
 MAX_FD="maximum"
@@ -114,17 +114,21 @@ if [ "$cygwin" = "true" -o "$msys" = "true" ] ; then
     ROOTDIRSRAW=`find "$APP_HOME" -type d -maxdepth 1`
     ROOTDIRS=""
     for dir in $ROOTDIRSRAW; do
-        ROOTDIRS="$ROOTDIRS `cygpath --path --mixed "$dir"`"
+        ROOTDIRS="$ROOTDIRS `cygpath --path --mixed \"$dir\"`"
     done
 fi
 
-# Split up the JVM_OPTS And GRADLE_OPTS values into an array
-# POSIX sh compatible
-set -- $DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS
-JVM_OPTS=""
-for opt in "$@"; do
-    JVM_OPTS="$JVM_OPTS \"$opt\""
-done
-JVM_OPTS="$JVM_OPTS \"-Dorg.gradle.appname=$APP_BASE_NAME\""
+# Collect all arguments for the java command
+# Use environment variables for JVM options (standard Gradle approach)
+# DEFAULT_JVM_OPTS, JAVA_OPTS, GRADLE_OPTS are passed via environment
 
-eval exec "$JAVACMD" $JVM_OPTS -classpath "$CLASSPATH" org.gradle.wrapper.GradleWrapperMain "$@"
+# Add the app name system property
+DEFAULT_JVM_OPTS="$DEFAULT_JVM_OPTS -Dorg.gradle.appname=$APP_BASE_NAME"
+
+# Execute Gradle
+# The JVM options are passed via JAVA_OPTS and GRADLE_OPTS environment variables
+# which are read by the Gradle wrapper main class
+export JAVA_OPTS="$DEFAULT_JVM_OPTS $JAVA_OPTS"
+export GRADLE_OPTS="$GRADLE_OPTS"
+
+exec "$JAVACMD" $JAVA_OPTS $GRADLE_OPTS -classpath "$CLASSPATH" org.gradle.wrapper.GradleWrapperMain "$@"
