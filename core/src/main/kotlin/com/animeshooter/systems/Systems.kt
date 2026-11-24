@@ -537,8 +537,8 @@ class UltimateSystem(priority: Int) : IteratingSystem(
                 if (MathUtils.random() < 0.3f) {
                     // Find enemies and fire homing projectiles
                     val enemies = eng.getEntitiesFor(Family.all(EnemyComponent::class.java).get())
-                    for (i in 0 until Math.min(3, enemies.size)) {
-                        val enemy = enemies.get(MathUtils.random(enemies.size - 1))
+                    for (i in 0 until Math.min(3, enemies.count())) {
+                        val enemy = enemies[MathUtils.random(enemies.count() - 1)]
                         val enemyTransform = enemy.getComponent(TransformComponent::class.java)
                         val proj = factory.createPlayerProjectile(entity, transform.position.x, transform.position.y + 20f)
                         proj.getComponent(ProjectileComponent::class.java)?.isHoming = true

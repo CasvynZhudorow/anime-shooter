@@ -110,7 +110,7 @@ class StageClearScreen(
         for (i in 0..30) {
             val starX = (i * 137 + time * 8) % screenWidth
             val starY = (i * 211 + time * 5) % screenHeight
-            val alpha = 0.2f + 0.3f * MathUtils.sin(time * 1.5 + i)
+            val alpha = 0.2f + 0.3f * MathUtils.sin(time * 1.5f + i)
             batch.setColor(Color.WHITE.cpy().mul(alpha))
             batch.draw(whiteTexture, starX, starY, 2f, 2f)
         }

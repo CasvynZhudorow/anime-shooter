@@ -92,7 +92,7 @@ class ShipSelectScreen(private val game: GameMain) : ScreenAdapter() {
         if (Gdx.input.isTouched()) {
             val x = Gdx.input.getX()
             if (!touchDragged) {
-                lastTouchX = x
+                lastTouchX = x.toFloat()
                 touchDragged = true
             } else {
                 val delta = lastTouchX - x

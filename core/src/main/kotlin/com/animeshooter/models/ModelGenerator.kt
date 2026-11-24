@@ -80,44 +80,44 @@ object ModelGenerator {
     fun createEnemyModel(enemyType: com.animeshooter.ecs.EnemyType): ModelInstance {
         val (model, color) = when (enemyType) {
             com.animeshooter.ecs.EnemyType.STRAIGHT -> {
-                val model = modelBuilder.begin()
-                model.part("body", GL20.GL_TRIANGLES, 
+                modelBuilder.begin()
+                modelBuilder.part("body", GL20.GL_TRIANGLES, 
                     Material(ColorAttribute.createDiffuse(Color.RED))).apply { box(10f, 10f, 4f) }
                 // Sensor eye
-                model.part("eye", GL20.GL_TRIANGLES,
+                modelBuilder.part("eye", GL20.GL_TRIANGLES,
                     Material(ColorAttribute.createDiffuse(Color.valueOf("FF0000")))).apply { sphere(2f, 2f, 2f, 8, 8); transform.setToTranslation(0f, 4f, 2f) }
-                model.end() to Color.RED
+                modelBuilder.end() to Color.RED
             }
             com.animeshooter.ecs.EnemyType.SPREAD -> {
-                val model = modelBuilder.begin()
-                model.part("body", GL20.GL_TRIANGLES,
+                modelBuilder.begin()
+                modelBuilder.part("body", GL20.GL_TRIANGLES,
                     Material(ColorAttribute.createDiffuse(Color.MAGENTA))).apply { box(12f, 12f, 4f) }
                 // Three prongs
-                model.part("prong1", GL20.GL_TRIANGLES,
+                modelBuilder.part("prong1", GL20.GL_TRIANGLES,
                     Material(ColorAttribute.createDiffuse(Color.MAGENTA))).apply { box(3f, 8f, 2f); transform.setToTranslation(-5f, 2f, 0f) }
-                model.part("prong2", GL20.GL_TRIANGLES,
+                modelBuilder.part("prong2", GL20.GL_TRIANGLES,
                     Material(ColorAttribute.createDiffuse(Color.MAGENTA))).apply { box(3f, 8f, 2f); transform.setToTranslation(0f, 6f, 0f) }
-                model.part("prong3", GL20.GL_TRIANGLES,
+                modelBuilder.part("prong3", GL20.GL_TRIANGLES,
                     Material(ColorAttribute.createDiffuse(Color.MAGENTA))).apply { box(3f, 8f, 2f); transform.setToTranslation(5f, 2f, 0f) }
                 // Energy cores
-                model.part("core", GL20.GL_TRIANGLES,
+                modelBuilder.part("core", GL20.GL_TRIANGLES,
                     Material(ColorAttribute.createDiffuse(Color.valueOf("FF00FF")))).apply { sphere(1.5f, 1.5f, 1.5f, 8, 8); transform.setToTranslation(0f, 0f, 2f) }
-                model.end() to Color.MAGENTA
+                modelBuilder.end() to Color.MAGENTA
             }
             com.animeshooter.ecs.EnemyType.BOSS -> {
-                val model = modelBuilder.begin()
+                modelBuilder.begin()
                 // Central core
-                model.part("core", GL20.GL_TRIANGLES,
+                modelBuilder.part("core", GL20.GL_TRIANGLES,
                     Material(ColorAttribute.createDiffuse(Color.valueOf("000080")))).apply { sphere(20f, 20f, 20f, 16, 16) }
                 // Rotating shield segments
                 for (i in 0..2) {
-                    model.part("shield$i", GL20.GL_TRIANGLES,
+                    modelBuilder.part("shield$i", GL20.GL_TRIANGLES,
                         Material(ColorAttribute.createDiffuse(Color.valueOf("FFD700")))).apply { box(50f, 5f, 5f) }
                 }
                 // Weapon ports
-                model.part("weapons", GL20.GL_TRIANGLES,
+                modelBuilder.part("weapons", GL20.GL_TRIANGLES,
                     Material(ColorAttribute.createDiffuse(Color.RED))).apply { box(4f, 4f, 8f); transform.setToTranslation(0f, 0f, 22f) }
-                model.end() to Color.valueOf("FFD700")
+                modelBuilder.end() to Color.valueOf("FFD700")
             }
         }
         return ModelInstance(model)
@@ -126,16 +126,16 @@ object ModelGenerator {
     fun createProjectileModel(source: com.animeshooter.ecs.ProjectileSource): ModelInstance {
         val (model, color) = when (source) {
             com.animeshooter.ecs.ProjectileSource.PLAYER -> {
-                val model = modelBuilder.begin()
-                model.part("projectile", GL20.GL_TRIANGLES,
+                modelBuilder.begin()
+                modelBuilder.part("projectile", GL20.GL_TRIANGLES,
                     Material(ColorAttribute.createDiffuse(Color.CYAN))).apply { box(2f, 8f, 2f) }
-                model.end() to Color.CYAN
+                modelBuilder.end() to Color.CYAN
             }
             com.animeshooter.ecs.ProjectileSource.ENEMY -> {
-                val model = modelBuilder.begin()
-                model.part("projectile", GL20.GL_TRIANGLES,
+                modelBuilder.begin()
+                modelBuilder.part("projectile", GL20.GL_TRIANGLES,
                     Material(ColorAttribute.createDiffuse(Color.RED))).apply { box(2f, 8f, 2f) }
-                model.end() to Color.RED
+                modelBuilder.end() to Color.RED
             }
         }
         return ModelInstance(model)
@@ -144,38 +144,37 @@ object ModelGenerator {
     fun createPickupModel(pickupType: com.animeshooter.ecs.PickupType): ModelInstance {
         val (model, color) = when (pickupType) {
             com.animeshooter.ecs.PickupType.WEAPON_UPGRADE -> {
-                val model = modelBuilder.begin()
-                model.part("pickup", GL20.GL_TRIANGLES,
+                modelBuilder.begin()
+                modelBuilder.part("pickup", GL20.GL_TRIANGLES,
                     Material(ColorAttribute.createDiffuse(Color.GREEN))).apply { box(6f, 6f, 6f) }
-                model.end() to Color.GREEN
+                modelBuilder.end() to Color.GREEN
             }
             com.animeshooter.ecs.PickupType.ULTIMATE_CHARGE -> {
-                val model = modelBuilder.begin()
-                model.part("pickup", GL20.GL_TRIANGLES,
+                modelBuilder.begin()
+                modelBuilder.part("pickup", GL20.GL_TRIANGLES,
                     Material(ColorAttribute.createDiffuse(Color.GOLD))).apply { box(6f, 6f, 6f) }
-                model.end() to Color.GOLD
+                modelBuilder.end() to Color.GOLD
             }
             com.animeshooter.ecs.PickupType.HEALTH -> {
-                val model = modelBuilder.begin()
-                model.part("pickup", GL20.GL_TRIANGLES,
+                modelBuilder.begin()
+                modelBuilder.part("pickup", GL20.GL_TRIANGLES,
                     Material(ColorAttribute.createDiffuse(Color.RED))).apply { box(6f, 6f, 6f) }
-                model.end() to Color.RED
+                modelBuilder.end() to Color.RED
             }
             com.animeshooter.ecs.PickupType.SCORE_BONUS -> {
-                val model = modelBuilder.begin()
-                model.part("pickup", GL20.GL_TRIANGLES,
+                modelBuilder.begin()
+                modelBuilder.part("pickup", GL20.GL_TRIANGLES,
                     Material(ColorAttribute.createDiffuse(Color.WHITE))).apply { box(6f, 6f, 6f) }
-                model.end() to Color.WHITE
+                modelBuilder.end() to Color.WHITE
             }
         }
         return ModelInstance(model)
     }
     
     fun createExplosionParticle(): ModelInstance {
-        val model = modelBuilder.begin()
-        model.part("particle", GL20.GL_TRIANGLES,
+        modelBuilder.begin()
+        modelBuilder.part("particle", GL20.GL_TRIANGLES,
             Material(ColorAttribute.createDiffuse(Color.ORANGE))).apply { box(4f, 4f, 4f) }
-        model.end()
-        return ModelInstance(model)
+        return ModelInstance(modelBuilder.end())
     }
 }

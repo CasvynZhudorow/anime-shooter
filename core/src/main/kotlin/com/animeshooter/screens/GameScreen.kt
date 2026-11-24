@@ -164,7 +164,7 @@ class GameScreen(private val game: GameMain) : ScreenAdapter() {
                 val instance = modelComp.modelInstance!!
                 instance.transform.setToTranslation(transformComp.position)
                 instance.transform.rotate(com.badlogic.gdx.math.Vector3(0f, 0f, 1f), transformComp.rotation)
-                instance.transform.scale(transformComp.scale)
+                instance.transform.scale(transformComp.scale.x, transformComp.scale.y, transformComp.scale.z)
                 
                 // Apply color
                 instance.materials.forEach { material ->
@@ -188,7 +188,7 @@ class GameScreen(private val game: GameMain) : ScreenAdapter() {
             if (modelComp.modelInstance != null) {
                 val instance = modelComp.modelInstance!!
                 instance.transform.setToTranslation(transformComp.position)
-                instance.transform.scale(particleComp.scale)
+                instance.transform.scale(particleComp.scale, particleComp.scale, particleComp.scale)
                 
                 val alpha = 1f - particleComp.lifetime / particleComp.maxLifetime
                 val color = particleComp.color.cpy().mul(alpha)
@@ -280,7 +280,7 @@ class GameScreen(private val game: GameMain) : ScreenAdapter() {
         drawRect(x, y, w, h, 2f)
         
         // Invulnerable flash
-        if (isInvulnerable && (System.currentTimeMillis() / 100) % 2 == 0) {
+        if (isInvulnerable && (System.currentTimeMillis() / 100) % 2L == 0L) {
             batch.setColor(Color.WHITE.cpy().mul(0.5f))
             batch.draw(whiteTexture, x, y, w, h)
         }
