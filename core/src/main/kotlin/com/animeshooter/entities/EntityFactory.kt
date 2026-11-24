@@ -67,7 +67,7 @@ class EntityFactory(private val engine: PooledEngine) {
         val collisionComp = CollisionComponent().apply {
             radius = 16f
             collisionLayer = 1
-            collisionMask = 2 | 4 // Enemy + Pickup
+            collisionMask = 2 or 4 // Enemy + Pickup
         }
         
         val healthComp = HealthComponent().apply {

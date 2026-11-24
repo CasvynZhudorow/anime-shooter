@@ -5,6 +5,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -20,6 +22,7 @@ class StageClearScreen(
     private lateinit var batch: SpriteBatch
     private lateinit var font: BitmapFont
     private lateinit var viewport: FitViewport
+    private lateinit var whiteTexture: Texture
     private var time = 0f
     private var canContinue = false
     
@@ -32,6 +35,13 @@ class StageClearScreen(
         font.data.setScale(2f)
         viewport = FitViewport(screenWidth, screenHeight)
         viewport.apply()
+        
+        // Create 1x1 white texture for drawing
+        val pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
+        pixmap.setColor(Color.WHITE)
+        pixmap.fill()
+        whiteTexture = Texture(pixmap)
+        pixmap.dispose()
         
         canContinue = false
         time = 0f
@@ -55,18 +65,18 @@ class StageClearScreen(
         // Stage clear text
         font.color = Color.GOLD
         val clearLayout = GlyphLayout(font, "STAGE $clearedStage CLEAR!")
-        font.draw(batch, clearLayout, (screenWidth - clearLayout.width) / 2, screenHeight * 0.7f)
+        font.draw(batch, clearLayout, (screenWidth - clearLayout.width) / 2f, screenHeight * 0.7f)
         
         // Score
         font.color = Color.WHITE
         font.data.setScale(1.5f)
         val scoreLayout = GlyphLayout(font, "SCORE: $score")
-        font.draw(batch, scoreLayout, (screenWidth - scoreLayout.width) / 2, screenHeight * 0.5f)
+        font.draw(batch, scoreLayout, (screenWidth - scoreLayout.width) / 2f, screenHeight * 0.5f)
         
         // Bonus
         val bonus = clearedStage * 500
         val bonusLayout = GlyphLayout(font, "STAGE BONUS: +$bonus")
-        font.draw(batch, bonusLayout, (screenWidth - bonusLayout.width) / 2, screenHeight * 0.4f)
+        font.draw(batch, bonusLayout, (screenWidth - bonusLayout.width) / 2f, screenHeight * 0.4f)
         
         // Next stage preview
         font.color = Color.CYAN
@@ -74,14 +84,14 @@ class StageClearScreen(
         val nextStage = clearedStage + 1
         val nextText = if (nextStage <= 5) "NEXT: STAGE $nextStage" else "ALL STAGES CLEARED!"
         val nextLayout = GlyphLayout(font, nextText)
-        font.draw(batch, nextLayout, (screenWidth - nextLayout.width) / 2, screenHeight * 0.3f)
+        font.draw(batch, nextLayout, (screenWidth - nextLayout.width) / 2f, screenHeight * 0.3f)
         
         // Tap to continue
         if (canContinue) {
             val alpha = (MathUtils.sin(time * 3f) + 1f) / 2f * 0.5f + 0.5f
             font.color = Color.GRAY.cpy().mul(alpha)
             val hintLayout = GlyphLayout(font, "TAP TO CONTINUE")
-            font.draw(batch, hintLayout, (screenWidth - hintLayout.width) / 2, screenHeight * 0.15f)
+            font.draw(batch, hintLayout, (screenWidth - hintLayout.width) / 2f, screenHeight * 0.15f)
         }
         
         batch.end()
@@ -102,7 +112,7 @@ class StageClearScreen(
             val starY = (i * 211 + time * 5) % screenHeight
             val alpha = 0.2f + 0.3f * MathUtils.sin(time * 1.5 + i)
             batch.setColor(Color.WHITE.cpy().mul(alpha))
-            batch.draw(batch.getColor().r, starX, starY, 2f, 2f)
+            batch.draw(whiteTexture, starX, starY, 2f, 2f)
         }
         batch.setColor(Color.WHITE)
     }
@@ -114,5 +124,6 @@ class StageClearScreen(
     override fun dispose() {
         batch.dispose()
         font.dispose()
+        whiteTexture.dispose()
     }
 }

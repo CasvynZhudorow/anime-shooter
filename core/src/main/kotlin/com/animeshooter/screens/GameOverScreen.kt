@@ -5,6 +5,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -21,6 +23,7 @@ class GameOverScreen(
     private lateinit var batch: SpriteBatch
     private lateinit var font: BitmapFont
     private lateinit var viewport: FitViewport
+    private lateinit var whiteTexture: Texture
     private var time = 0f
     private var canExit = false
     
@@ -33,6 +36,13 @@ class GameOverScreen(
         font.data.setScale(2f)
         viewport = FitViewport(screenWidth, screenHeight)
         viewport.apply()
+        
+        // Create 1x1 white texture for drawing
+        val pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
+        pixmap.setColor(Color.WHITE)
+        pixmap.fill()
+        whiteTexture = Texture(pixmap)
+        pixmap.dispose()
         
         // Delay before allowing exit
         canExit = false
@@ -57,23 +67,23 @@ class GameOverScreen(
         // Game Over / Victory text
         font.color = if (reason == "Victory!") Color.GOLD else Color.RED
         val reasonLayout = GlyphLayout(font, reason)
-        font.draw(batch, reasonLayout, (screenWidth - reasonLayout.width) / 2, screenHeight * 0.75f)
+        font.draw(batch, reasonLayout, (screenWidth - reasonLayout.width) / 2f, screenHeight * 0.75f)
         
         // Final score
         font.color = Color.WHITE
         font.data.setScale(1.5f)
         val scoreLayout = GlyphLayout(font, "FINAL SCORE: $finalScore")
-        font.draw(batch, scoreLayout, (screenWidth - scoreLayout.width) / 2, screenHeight * 0.55f)
+        font.draw(batch, scoreLayout, (screenWidth - scoreLayout.width) / 2f, screenHeight * 0.55f)
         
         // High score
         val highScoreLayout = GlyphLayout(font, "HIGH SCORE: $highScore")
-        font.draw(batch, highScoreLayout, (screenWidth - highScoreLayout.width) / 2, screenHeight * 0.45f)
+        font.draw(batch, highScoreLayout, (screenWidth - highScoreLayout.width) / 2f, screenHeight * 0.45f)
         
         // New high score indicator
         if (finalScore >= highScore && finalScore > 0) {
             font.color = Color.GOLD
             val newHsLayout = GlyphLayout(font, "NEW HIGH SCORE!")
-            font.draw(batch, newHsLayout, (screenWidth - newHsLayout.width) / 2, screenHeight * 0.35f)
+            font.draw(batch, newHsLayout, (screenWidth - newHsLayout.width) / 2f, screenHeight * 0.35f)
         }
         
         // Tap to continue
@@ -82,7 +92,7 @@ class GameOverScreen(
             font.color = Color.GRAY.cpy().mul(alpha)
             font.data.setScale(1f)
             val hintLayout = GlyphLayout(font, "TAP TO RETURN TO MENU")
-            font.draw(batch, hintLayout, (screenWidth - hintLayout.width) / 2, screenHeight * 0.2f)
+            font.draw(batch, hintLayout, (screenWidth - hintLayout.width) / 2f, screenHeight * 0.2f)
             font.data.setScale(2f)
         }
         
@@ -99,7 +109,7 @@ class GameOverScreen(
             val starY = (i * 211 + time * 3) % screenHeight
             val alpha = 0.1f + 0.2f * MathUtils.sin(time + i)
             batch.setColor(Color.WHITE.cpy().mul(alpha))
-            batch.draw(batch.getColor().r, starX, starY, 2f, 2f)
+            batch.draw(whiteTexture, starX, starY, 2f, 2f)
         }
         batch.setColor(Color.WHITE)
     }
@@ -111,5 +121,6 @@ class GameOverScreen(
     override fun dispose() {
         batch.dispose()
         font.dispose()
+        whiteTexture.dispose()
     }
 }

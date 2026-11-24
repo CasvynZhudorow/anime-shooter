@@ -7,6 +7,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -21,6 +23,7 @@ class GameScreen(private val game: GameMain) : ScreenAdapter() {
     private lateinit var font: BitmapFont
     private lateinit var viewport: FitViewport
     private lateinit var uiLayout: GlyphLayout
+    private lateinit var whiteTexture: Texture
     
     private val screenWidth = 540f
     private val screenHeight = 960f
@@ -37,6 +40,13 @@ class GameScreen(private val game: GameMain) : ScreenAdapter() {
         viewport = FitViewport(screenWidth, screenHeight)
         viewport.apply()
         uiLayout = GlyphLayout()
+        
+        // Create 1x1 white texture for UI drawing
+        val pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
+        pixmap.setColor(Color.WHITE)
+        pixmap.fill()
+        whiteTexture = Texture(pixmap)
+        pixmap.dispose()
         
         // Setup callbacks
         val world = game.gameWorld
@@ -68,7 +78,7 @@ class GameScreen(private val game: GameMain) : ScreenAdapter() {
         
         // Render
         Gdx.gl.glClearColor(0.02f, 0.02f, 0.08f, 1f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
         
         // Apply screen shake to camera
         val camera = viewport.getCamera()
@@ -100,24 +110,26 @@ class GameScreen(private val game: GameMain) : ScreenAdapter() {
             val y = Gdx.graphics.height - Gdx.input.getY() // Flip Y
             
             // Convert to viewport coordinates
-            val touchX = viewport.unproject(com.badlogic.gdx.math.Vector3(x.toFloat(), y.toFloat(), 0f)).x
-            val touchY = viewport.unproject(com.badlogic.gdx.math.Vector3(x.toFloat(), y.toFloat(), 0f)).y
+            val touchVec = com.badlogic.gdx.math.Vector3(x.toFloat(), y.toFloat(), 0f)
+            viewport.unproject(touchVec)
+            val touchX = touchVec.x
+            val touchY = touchVec.y
             
             world.setPlayerInput(touchX, touchY, true, false)
         } else {
             world.setPlayerInput(0f, 0f, false, false)
         }
         
-        // Ultimate key (Space on desktop, or double-tap on mobile - simplified to touch)
-                if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.SPACE)) {
-                    world.setPlayerInput(0f, 0f, false, true)
-                }
+        // Ultimate key (Space on desktop)
+        if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.SPACE)) {
+            world.setPlayerInput(0f, 0f, false, true)
+        }
         
-                // Pause
-                if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.ESCAPE) || 
-                    Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.P)) {
-                    world.togglePause()
-                }
+        // Pause
+        if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.ESCAPE) || 
+            Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.P)) {
+            world.togglePause()
+        }
     }
     
     private fun updateScreenShake(delta: Float) {
@@ -151,7 +163,7 @@ class GameScreen(private val game: GameMain) : ScreenAdapter() {
             if (modelComp.modelInstance != null && modelComp.isVisible) {
                 val instance = modelComp.modelInstance!!
                 instance.transform.setToTranslation(transformComp.position)
-                instance.transform.rotate(com.badlogic.gdx.math.Vector3(0, 0, 1), transformComp.rotation)
+                instance.transform.rotate(com.badlogic.gdx.math.Vector3(0f, 0f, 1f), transformComp.rotation)
                 instance.transform.scale(transformComp.scale)
                 
                 // Apply color
@@ -202,22 +214,22 @@ class GameScreen(private val game: GameMain) : ScreenAdapter() {
         // Top UI - Score and Stage
         font.color = Color.WHITE
         uiLayout.setText(font, "STAGE ${world.currentStage}-${world.currentWave}  SCORE: ${world.score}")
-        font.draw(batch, uiLayout, 20, screenHeight - 20)
+        font.draw(batch, uiLayout, 20f, screenHeight - 20f)
         
         // High score
         uiLayout.setText(font, "BEST: ${world.highScore}")
-        font.draw(batch, uiLayout, screenWidth - uiLayout.width - 20, screenHeight - 20)
+        font.draw(batch, uiLayout, screenWidth - uiLayout.width - 20f, screenHeight - 20f)
         
         // Health bar (left)
-        drawHealthBar(20, 60, 200, 20, healthComp.currentHealth, healthComp.maxHealth, healthComp.isInvulnerable)
+        drawHealthBar(20f, 60f, 200f, 20f, healthComp.currentHealth, healthComp.maxHealth, healthComp.isInvulnerable)
         
         // Ultimate meter (right)
-        drawUltimateMeter(screenWidth - 220, 60, 200, 20, playerComp.ultimateMeter, playerComp.maxUltimateMeter, ultimateComp.isActive, ultimateComp.cooldown)
+        drawUltimateMeter(screenWidth - 220f, 60f, 200f, 20f, playerComp.ultimateMeter, playerComp.maxUltimateMeter, ultimateComp.isActive, ultimateComp.cooldown)
         
         // Weapon level
         font.color = Color.CYAN
         uiLayout.setText(font, "WEAPON LV. ${playerComp.weaponLevel}/${playerComp.maxWeaponLevel}")
-        font.draw(batch, uiLayout, 20, 100)
+        font.draw(batch, uiLayout, 20f, 100f)
         
         // Ship type
         font.color = when (playerComp.shipType) {
@@ -226,14 +238,14 @@ class GameScreen(private val game: GameMain) : ScreenAdapter() {
             ShipType.HEAVY -> Color.ORANGE
         }
         uiLayout.setText(font, playerComp.shipType.name)
-        font.draw(batch, uiLayout, 20, 130)
+        font.draw(batch, uiLayout, 20f, 130f)
         
         // Pause indicator
         if (world.isPaused) {
             font.color = Color.WHITE
             font.data.setScale(3f)
             uiLayout.setText(font, "PAUSED")
-            font.draw(batch, uiLayout, (screenWidth - uiLayout.width) / 2, screenHeight / 2)
+            font.draw(batch, uiLayout, (screenWidth - uiLayout.width) / 2f, screenHeight / 2f)
             font.data.setScale(1f)
         }
         
@@ -248,7 +260,7 @@ class GameScreen(private val game: GameMain) : ScreenAdapter() {
                 val bossComp = boss.getComponent(EnemyComponent::class.java)
                 val bossHealth = boss.getComponent(HealthComponent::class.java)
                 
-                drawBossHealthBar(screenWidth / 2 - 150, screenHeight - 60, 300, 25, bossHealth.currentHealth, bossHealth.maxHealth, bossComp.bossPhase, bossComp.maxBossPhases)
+                drawBossHealthBar(screenWidth / 2f - 150f, screenHeight - 60f, 300f, 25f, bossHealth.currentHealth, bossHealth.maxHealth, bossComp.bossPhase, bossComp.maxBossPhases)
             }
         }
     }
@@ -256,12 +268,12 @@ class GameScreen(private val game: GameMain) : ScreenAdapter() {
     private fun drawHealthBar(x: Float, y: Float, w: Float, h: Float, current: Int, max: Int, isInvulnerable: Boolean) {
         // Background
         batch.setColor(Color.DARK_GRAY)
-        batch.draw(batch.getColor().r, x, y, w, h)
+        batch.draw(whiteTexture, x, y, w, h)
         
         // Health
         val healthPercent = current.toFloat() / max
         batch.setColor(if (healthPercent > 0.5f) Color.GREEN else if (healthPercent > 0.25f) Color.YELLOW else Color.RED)
-        batch.draw(batch.getColor().r, x, y, w * healthPercent, h)
+        batch.draw(whiteTexture, x, y, w * healthPercent, h)
         
         // Border
         batch.setColor(Color.WHITE)
@@ -270,7 +282,7 @@ class GameScreen(private val game: GameMain) : ScreenAdapter() {
         // Invulnerable flash
         if (isInvulnerable && (System.currentTimeMillis() / 100) % 2 == 0) {
             batch.setColor(Color.WHITE.cpy().mul(0.5f))
-            batch.draw(batch.getColor().r, x, y, w, h)
+            batch.draw(whiteTexture, x, y, w, h)
         }
         batch.setColor(Color.WHITE)
     }
@@ -278,13 +290,13 @@ class GameScreen(private val game: GameMain) : ScreenAdapter() {
     private fun drawUltimateMeter(x: Float, y: Float, w: Float, h: Float, current: Float, max: Float, isActive: Boolean, cooldown: Float) {
         // Background
         batch.setColor(Color.DARK_GRAY)
-        batch.draw(batch.getColor().r, x, y, w, h)
+        batch.draw(whiteTexture, x, y, w, h)
         
         // Meter
         val percent = if (isActive) 1f else if (cooldown > 0f) 0f else current / max
         
         batch.setColor(if (isActive) Color.CYAN else if (cooldown > 0f) Color.GRAY else Color.GOLD)
-        batch.draw(batch.getColor().r, x, y, w * percent, h)
+        batch.draw(whiteTexture, x, y, w * percent, h)
         
         // Border
         batch.setColor(Color.WHITE)
@@ -294,7 +306,7 @@ class GameScreen(private val game: GameMain) : ScreenAdapter() {
         font.color = Color.GOLD
         val label = if (isActive) "ULTIMATE ACTIVE" else if (cooldown > 0f) "COOLDOWN ${cooldown.toInt()}s" else "ULTIMATE READY"
         uiLayout.setText(font, label)
-        font.draw(batch, uiLayout, x + (w - uiLayout.width) / 2, y - 5)
+        font.draw(batch, uiLayout, x + (w - uiLayout.width) / 2f, y - 5f)
         
         batch.setColor(Color.WHITE)
     }
@@ -302,7 +314,7 @@ class GameScreen(private val game: GameMain) : ScreenAdapter() {
     private fun drawBossHealthBar(x: Float, y: Float, w: Float, h: Float, current: Int, max: Int, phase: Int, maxPhases: Int) {
         // Background
         batch.setColor(Color.DARK_GRAY)
-        batch.draw(batch.getColor().r, x, y, w, h)
+        batch.draw(whiteTexture, x, y, w, h)
         
         // Health segments per phase
         val phaseWidth = w / maxPhases
@@ -313,12 +325,12 @@ class GameScreen(private val game: GameMain) : ScreenAdapter() {
             val segmentHealth = MathUtils.clamp(healthPercent * maxPhases - i, 0f, 1f)
             
             batch.setColor(if (segmentHealth > 0f) Color.RED else Color.DARK_GRAY)
-            batch.draw(batch.getColor().r, segmentX, y, phaseWidth * segmentHealth, h)
+            batch.draw(whiteTexture, segmentX, y, phaseWidth * segmentHealth, h)
             
             // Phase separator
             if (i < maxPhases - 1) {
                 batch.setColor(Color.WHITE)
-                batch.draw(batch.getColor().r, segmentX + phaseWidth - 1, y, 2, h)
+                batch.draw(whiteTexture, segmentX + phaseWidth - 1f, y, 2f, h)
             }
         }
         
@@ -329,16 +341,16 @@ class GameScreen(private val game: GameMain) : ScreenAdapter() {
         // Phase indicator
         font.color = Color.WHITE
         uiLayout.setText(font, "BOSS PHASE $phase/$maxPhases")
-        font.draw(batch, uiLayout, x + (w - uiLayout.width) / 2, y - 5)
+        font.draw(batch, uiLayout, x + (w - uiLayout.width) / 2f, y - 5f)
         
         batch.setColor(Color.WHITE)
     }
     
     private fun drawRect(x: Float, y: Float, w: Float, h: Float, thickness: Float) {
-        batch.draw(batch.getColor().r, x, y, w, thickness)
-        batch.draw(batch.getColor().r, x, y + h - thickness, w, thickness)
-        batch.draw(batch.getColor().r, x, y, thickness, h)
-        batch.draw(batch.getColor().r, x + w - thickness, y, thickness, h)
+        batch.draw(whiteTexture, x, y, w, thickness)
+        batch.draw(whiteTexture, x, y + h - thickness, w, thickness)
+        batch.draw(whiteTexture, x, y, thickness, h)
+        batch.draw(whiteTexture, x + w - thickness, y, thickness, h)
     }
     
     override fun resize(width: Int, height: Int) {
@@ -349,5 +361,6 @@ class GameScreen(private val game: GameMain) : ScreenAdapter() {
         batch.dispose()
         modelBatch.dispose()
         font.dispose()
+        whiteTexture.dispose()
     }
 }

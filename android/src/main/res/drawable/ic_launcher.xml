@@ -12,6 +12,6 @@
     <circle
         android:centerX="54"
         android:centerY="54"
-        android:radius="20"
+        android:radius="20dp"
         android:fillColor="#000033" />
 </vector>

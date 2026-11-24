@@ -217,6 +217,7 @@ class EnemyAISystem(priority: Int) : IteratingSystem(
                     eng.addEntity(proj)
                 }
             }
+            else -> {} // BOSS handled by BossAISystem
         }
     }
 }

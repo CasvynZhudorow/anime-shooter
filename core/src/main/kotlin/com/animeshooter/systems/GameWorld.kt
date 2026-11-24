@@ -190,7 +190,7 @@ class GameWorld {
             // Check if wave cleared
             val enemies = engine.getEntitiesFor(
                 com.badlogic.ashley.core.Family.all(EnemyComponent::class.java).get()
-            ).filter { !it.getComponent(EnemyComponent::class.java)?.isBoss ?: false }
+            ).filter { !(it.getComponent(EnemyComponent::class.java)?.isBoss ?: false) }
             
             if (enemies.isEmpty() && enemiesInWave > 0) {
                 onWaveCleared()

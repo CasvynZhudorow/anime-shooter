@@ -6,13 +6,13 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g3d.ModelBatch
-import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.math.MathUtils
-import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.viewport.FitViewport
 
 class ShipSelectScreen(private val game: GameMain) : ScreenAdapter() {
@@ -21,6 +21,7 @@ class ShipSelectScreen(private val game: GameMain) : ScreenAdapter() {
     private lateinit var modelBatch: ModelBatch
     private lateinit var font: BitmapFont
     private lateinit var viewport: FitViewport
+    private lateinit var whiteTexture: Texture
     private var selectedIndex = 0
     private var time = 0f
     private var touchDragged = false
@@ -43,6 +44,13 @@ class ShipSelectScreen(private val game: GameMain) : ScreenAdapter() {
         viewport = FitViewport(screenWidth, screenHeight)
         viewport.apply()
         selectedIndex = 0
+        
+        // Create 1x1 white texture for drawing
+        val pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
+        pixmap.setColor(Color.WHITE)
+        pixmap.fill()
+        whiteTexture = Texture(pixmap)
+        pixmap.dispose()
     }
     
     override fun render(delta: Float) {
@@ -51,7 +59,7 @@ class ShipSelectScreen(private val game: GameMain) : ScreenAdapter() {
         handleInput()
         
         Gdx.gl.glClearColor(0.05f, 0.05f, 0.15f, 1f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
         
         batch.projectionMatrix = viewport.getCamera().combined
         modelBatch.begin(viewport.getCamera())
@@ -62,7 +70,7 @@ class ShipSelectScreen(private val game: GameMain) : ScreenAdapter() {
         // Title
         font.color = Color.WHITE
         val titleLayout = GlyphLayout(font, "SELECT YOUR SHIP")
-        font.draw(batch, titleLayout, (screenWidth - titleLayout.width) / 2, screenHeight * 0.9f)
+        font.draw(batch, titleLayout, (screenWidth - titleLayout.width) / 2f, screenHeight * 0.9f)
         
         // Ship cards
         for (i in ships.indices) {
@@ -73,7 +81,7 @@ class ShipSelectScreen(private val game: GameMain) : ScreenAdapter() {
         font.data.setScale(1f)
         font.color = Color.GRAY
         val hintLayout = GlyphLayout(font, "SWIPE LEFT/RIGHT • TAP TO CONFIRM")
-        font.draw(batch, hintLayout, (screenWidth - hintLayout.width) / 2, screenHeight * 0.1f)
+        font.draw(batch, hintLayout, (screenWidth - hintLayout.width) / 2f, screenHeight * 0.1f)
         font.data.setScale(1.5f)
         
         batch.end()
@@ -108,12 +116,12 @@ class ShipSelectScreen(private val game: GameMain) : ScreenAdapter() {
     private fun drawShipCard(index: Int, data: ShipData, isSelected: Boolean) {
         val cardWidth = screenWidth * 0.8f
         val cardHeight = screenHeight * 0.25f
-        val x = (screenWidth - cardWidth) / 2
-        val y = screenHeight * 0.6f - index * (cardHeight + 20)
+        val x = (screenWidth - cardWidth) / 2f
+        val y = screenHeight * 0.6f - index * (cardHeight + 20f)
         
         // Card background
         batch.setColor(if (isSelected) Color.CYAN.cpy().mul(0.3f) else Color.DARK_GRAY.cpy().mul(0.7f))
-        batch.draw(batch.getColor().r, x, y, cardWidth, cardHeight)
+        batch.draw(whiteTexture, x, y, cardWidth, cardHeight)
         batch.setColor(Color.WHITE)
         
         // Border if selected
@@ -126,22 +134,22 @@ class ShipSelectScreen(private val game: GameMain) : ScreenAdapter() {
         // Ship name
         font.color = data.color
         val nameLayout = GlyphLayout(font, data.name)
-        font.draw(batch, nameLayout, x + (cardWidth - nameLayout.width) / 2, y + cardHeight - 30)
+        font.draw(batch, nameLayout, x + (cardWidth - nameLayout.width) / 2f, y + cardHeight - 30f)
         
         // Description
         font.color = Color.LIGHT_GRAY
         font.data.setScale(0.8f)
         val descLayout = GlyphLayout(font, data.description)
-        font.draw(batch, descLayout, x + (cardWidth - descLayout.width) / 2, y + cardHeight - 70)
+        font.draw(batch, descLayout, x + (cardWidth - descLayout.width) / 2f, y + cardHeight - 70f)
         
         // Ultimate
         font.color = Color.GOLD
         val ultLayout = GlyphLayout(font, "ULTIMATE: ${data.ultimate}")
-        font.draw(batch, ultLayout, x + (cardWidth - ultLayout.width) / 2, y + cardHeight - 100)
+        font.draw(batch, ultLayout, x + (cardWidth - ultLayout.width) / 2f, y + cardHeight - 100f)
         font.data.setScale(1.5f)
         
         // Draw ship model
-        drawShipModel(data.shipType, x + cardWidth / 2, y + cardHeight / 2, time)
+        drawShipModel(data.shipType, x + cardWidth / 2f, y + cardHeight / 2f, time)
     }
     
     private fun drawShipModel(shipType: ShipType, x: Float, y: Float, time: Float) {
@@ -150,10 +158,10 @@ class ShipSelectScreen(private val game: GameMain) : ScreenAdapter() {
     }
     
     private fun drawRect(x: Float, y: Float, w: Float, h: Float, thickness: Float) {
-        batch.draw(batch.getColor().r, x, y, w, thickness)
-        batch.draw(batch.getColor().r, x, y + h - thickness, w, thickness)
-        batch.draw(batch.getColor().r, x, y, thickness, h)
-        batch.draw(batch.getColor().r, x + w - thickness, y, thickness, h)
+        batch.draw(whiteTexture, x, y, w, thickness)
+        batch.draw(whiteTexture, x, y + h - thickness, w, thickness)
+        batch.draw(whiteTexture, x, y, thickness, h)
+        batch.draw(whiteTexture, x + w - thickness, y, thickness, h)
     }
     
     private fun drawBackground() {
@@ -163,7 +171,7 @@ class ShipSelectScreen(private val game: GameMain) : ScreenAdapter() {
             val starY = (i * 211 + time * 8) % screenHeight
             val alpha = 0.2f + 0.3f * MathUtils.sin(time * 2 + i * 0.5f)
             batch.setColor(Color.WHITE.cpy().mul(alpha))
-            batch.draw(batch.getColor().r, starX, starY, 2f, 2f)
+            batch.draw(whiteTexture, starX, starY, 2f, 2f)
         }
         batch.setColor(Color.WHITE)
     }
@@ -176,6 +184,7 @@ class ShipSelectScreen(private val game: GameMain) : ScreenAdapter() {
         batch.dispose()
         modelBatch.dispose()
         font.dispose()
+        whiteTexture.dispose()
     }
     
     private data class ShipData(
